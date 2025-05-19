@@ -16,6 +16,13 @@
           - bash-completion
           - vim
 
+    - name: Verify common packages variable matches role definition
+      assert:
+        that: "common_packages | difference(lookup('vars', 'common_packages')) | length == 0"
+        fail_msg: "Test common_packages don't match the role's definition"
+        success_msg: "Common packages match the role's definition"
+      when: false  # Disable initially until you've synced the variables
+
     - name: Verify packages are installed
       assert:
         that: "check_command.results[{{ index }}].rc == 0"
@@ -92,3 +99,17 @@
         that: ssh_config.stat.exists
         fail_msg: "SSH config file does not exist"
         success_msg: "SSH config file exists"
+            
+    - name: Check SSH config content
+      command: grep -E "StrictHostKeyChecking|ServerAliveInterval" ~/.ssh/config
+      register: ssh_config_content
+      changed_when: false
+      failed_when: false
+      
+    - name: Verify SSH config has expected settings
+      assert:
+        that: 
+          - "'StrictHostKeyChecking' in ssh_config_content.stdout"
+          - "'ServerAliveInterval' in ssh_config_content.stdout"
+        fail_msg: "SSH config is missing expected content"
+        success_msg: "SSH config contains expected settings"

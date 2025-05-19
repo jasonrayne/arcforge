@@ -1,0 +1,94 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check if common packages are installed
+      command: which {{ item }}
+      register: check_command
+      changed_when: false
+      failed_when: false
+      loop: "{{ common_packages }}"
+      vars:
+        common_packages:
+          - grep
+          - sed
+          - bash-completion
+          - vim
+
+    - name: Verify packages are installed
+      assert:
+        that: "check_command.results[{{ index }}].rc == 0"
+        fail_msg: "{{ item }} is not installed"
+        success_msg: "{{ item }} is installed"
+      loop: "{{ common_packages }}"
+      loop_control:
+        index_var: index
+      vars:
+        common_packages:
+          - grep
+          - sed
+          - bash-completion
+          - vim
+
+    - name: Check Arch-specific packages
+      command: which {{ item }}
+      register: arch_check
+      changed_when: false
+      failed_when: false
+      loop:
+        - pacman
+      when: "'arch' in inventory_hostname"
+      
+    - name: Verify Arch packages
+      assert:
+        that: "arch_check.results[{{ index }}].rc == 0"
+        fail_msg: "{{ item }} is not installed"
+        success_msg: "{{ item }} is installed"
+      loop:
+        - pacman
+      loop_control:
+        index_var: index
+      when: "'arch' in inventory_hostname"
+              
+    - name: Check Ubuntu-specific packages
+      command: which {{ item }}
+      register: ubuntu_check
+      changed_when: false
+      failed_when: false
+      loop:
+        - apt
+      when: "'ubuntu' in inventory_hostname"
+      
+    - name: Verify Ubuntu packages
+      assert:
+        that: "ubuntu_check.results[{{ index }}].rc == 0"
+        fail_msg: "{{ item }} is not installed"
+        success_msg: "{{ item }} is installed"
+      loop:
+        - apt
+      loop_control:
+        index_var: index
+      when: "'ubuntu' in inventory_hostname"
+
+    - name: Check if SSH directory exists
+      stat:
+        path: ~/.ssh
+      register: ssh_dir
+      
+    - name: Verify SSH directory exists
+      assert:
+        that: ssh_dir.stat.exists and ssh_dir.stat.isdir
+        fail_msg: "SSH directory does not exist"
+        success_msg: "SSH directory exists"
+      
+    - name: Check if SSH config file exists
+      stat:
+        path: ~/.ssh/config
+      register: ssh_config
+      
+    - name: Verify SSH config exists
+      assert:
+        that: ssh_config.stat.exists
+        fail_msg: "SSH config file does not exist"
+        success_msg: "SSH config file exists"

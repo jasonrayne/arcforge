@@ -5,17 +5,35 @@ driver:
   name: podman
 platforms:
   - name: ubuntu-instance
-    image: ubuntu:22.04
+    image: docker.io/ubuntu:22.04
     pre_build_image: true
     command: ""
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
   - name: arch-instance
-    image: archlinux:latest
+    image: docker.io/archlinux:latest
     pre_build_image: true
     command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
+  inventory:
+    group_vars:
+      all:
+        ansible_python_interpreter: /usr/bin/python3
+  playbooks:
+    converge: converge.yml
+    prepare: prepare.yml
+  config_options:
+    defaults:
+      stdout_callback: yaml
+      display_skipped_hosts: true
+    diff:
+      always: true
 verifier:
   name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint

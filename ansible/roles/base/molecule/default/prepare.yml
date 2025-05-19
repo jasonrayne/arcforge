@@ -2,9 +2,20 @@
 - name: Prepare
   hosts: all
   gather_facts: false
-  become: true
   tasks:
-    - name: Install Python on Arch Linux
-      raw: pacman -Sy python --noconfirm
-      when: "ansible_distribution == 'Archlinux'"
+    - name: Install python on Arch
+      raw: pacman -Sy --noconfirm python
+      when: "'arch' in inventory_hostname"
       changed_when: false
+      failed_when: false
+      
+    - name: Install python on Ubuntu
+      raw: apt-get update && apt-get install -y python3
+      when: "'ubuntu' in inventory_hostname"
+      changed_when: false
+      failed_when: false
+      
+    - name: Install sudo
+      raw: "{% if 'arch' in inventory_hostname %}pacman -Sy --noconfirm sudo{% else %}apt-get install -y sudo{% endif %}"
+      changed_when: false
+      failed_when: false

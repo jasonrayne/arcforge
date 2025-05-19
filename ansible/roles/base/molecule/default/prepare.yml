@@ -1,0 +1,10 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install Python on Arch Linux
+      raw: pacman -Sy python --noconfirm
+      when: "ansible_distribution == 'Archlinux'"
+      changed_when: false

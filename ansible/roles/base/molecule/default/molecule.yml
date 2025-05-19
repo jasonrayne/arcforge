@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: ubuntu-instance
+    image: ubuntu:22.04
+    pre_build_image: true
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+  - name: arch-instance
+    image: archlinux:latest
+    pre_build_image: true
+    command: ""
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

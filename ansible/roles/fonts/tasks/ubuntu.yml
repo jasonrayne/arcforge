@@ -1,0 +1,8 @@
+---
+- name: Install font dependencies for Ubuntu
+  apt:
+    name:
+      - fontconfig
+      - fonts-dejavu
+    state: present
+  become: true

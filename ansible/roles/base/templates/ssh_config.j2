@@ -1,0 +1,24 @@
+# SSH Configuration
+Host github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa
+  
+{% if ansible_hostname == 'work-laptop' %}
+# Work-specific SSH config
+Host gitlab.work.example.com
+  IdentityFile ~/.ssh/id_rsa
+  User git
+{% else %}
+# Personal SSH config
+Host home-server
+  HostName 192.168.1.100
+  IdentityFile ~/.ssh/id_rsa
+  User {{ ansible_user_id }}
+{% endif %}
+
+# Global options
+Host *
+  ServerAliveInterval 60
+  ServerAliveCountMax 30
+  StrictHostKeyChecking ask
+  ForwardAgent no

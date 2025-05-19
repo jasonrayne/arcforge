@@ -1,0 +1,57 @@
+# roles/development/containers/tasks/main.yml
+- name: Install Distrobox dependencies
+  package:
+    name: "{{ distrobox_deps }}"
+    state: present
+  become: true
+
+- name: Install Distrobox
+  block:
+    - name: Check if Distrobox is installed
+      command: which distrobox
+      register: distrobox_check
+      failed_when: false
+      changed_when: false
+    
+    - name: Download Distrobox installer
+      get_url:
+        url: https://raw.githubusercontent.com/89luca89/distrobox/main/install
+        dest: /tmp/distrobox-install
+        mode: '0755'
+      when: distrobox_check.rc != 0
+    
+    - name: Install Distrobox
+      command: /tmp/distrobox-install
+      when: distrobox_check.rc != 0
+
+- name: Create development container
+  command: >
+    distrobox create 
+    --name {{ dev_container_name }} 
+    --image {{ dev_container_image }}
+    {% if gpu_type == 'nvidia' %}--nvidia{% endif %}
+  args:
+    creates: "~/.local/share/containers/storage/overlay-containers/{{ dev_container_name }}"
+
+- name: Configure container initialization
+  blockinfile:
+    path: "~/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - DISTROBOX"
+    block: |
+      # Auto-enter development container
+      if [[ -z "$CONTAINER_ID" && "$TERM" != "dumb" && -z "$SSH_CONNECTION" && -t 1 && "$AUTO_DEV_ENV" == "true" ]]; then
+        exec distrobox enter {{ dev_container_name }}
+      fi
+
+- name: Setup environment variables
+  blockinfile:
+    path: "~/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - ENV VARS"
+    block: |
+      # Environment setup
+      export AUTO_DEV_ENV={{ auto_enter_dev_env | default('false') }}
+      {% if work_environment | default(false) %}
+      export WORK_ENVIRONMENT=true
+      {% else %}
+      export WORK_ENVIRONMENT=false
+      {% endif %}

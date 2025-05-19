@@ -1,0 +1,30 @@
+---
+- name: Update Arch package database
+  pacman:
+    update_cache: yes
+  become: true
+
+- name: Install Arch-specific packages
+  pacman:
+    name: "{{ arch_packages }}"
+    state: present
+  become: true
+
+- name: Check if yay is installed
+  command: which yay
+  register: yay_check
+  failed_when: false
+  changed_when: false
+
+- name: Install yay (AUR helper)
+  block:
+    - name: Clone yay repository
+      git:
+        repo: https://aur.archlinux.org/yay.git
+        dest: /tmp/yay
+      when: yay_check.rc != 0
+    
+    - name: Build and install yay
+      shell: cd /tmp/yay && makepkg -si --noconfirm
+      when: yay_check.rc != 0
+  when: yay_check.rc != 0

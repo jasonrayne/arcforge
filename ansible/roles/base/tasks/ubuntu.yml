@@ -1,0 +1,19 @@
+---
+- name: Update apt package cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install Ubuntu-specific packages
+  apt:
+    name: "{{ ubuntu_packages }}"
+    state: present
+  become: true
+
+- name: Add PPAs
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop: "{{ ubuntu_ppas | default([]) }}"
+  become: true
+  when: ubuntu_ppas is defined

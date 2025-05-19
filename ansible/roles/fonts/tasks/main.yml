@@ -1,0 +1,40 @@
+---
+- name: Include OS-specific tasks
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] | lower }}.yml"
+    - "{{ ansible_facts['os_family'] | lower }}.yml"
+    - "generic.yml"
+
+- name: Check if JetBrainsMono Nerd Font is already installed
+  shell: fc-list | grep -i "JetBrainsMono Nerd"
+  register: font_check
+  changed_when: false
+  failed_when: false
+
+- name: Create font directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "~/.local/share/fonts"
+    - "~/.local/share/fonts/JetBrainsMono"
+  when: font_check.rc != 0
+
+- name: Download JetBrainsMono Nerd Font
+  get_url:
+    url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip
+    dest: /tmp/JetBrainsMono.zip
+  when: font_check.rc != 0
+
+- name: Extract JetBrainsMono Nerd Font
+  unarchive:
+    src: /tmp/JetBrainsMono.zip
+    dest: "~/.local/share/fonts/JetBrainsMono/"
+    remote_src: yes
+  when: font_check.rc != 0
+
+- name: Update font cache
+  command: fc-cache -fv
+  when: font_check.rc != 0

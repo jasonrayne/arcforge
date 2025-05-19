@@ -1,0 +1,28 @@
+---
+arch_packages:
+  - base-devel
+  - git
+  - vim
+  - neovim
+  - tmux
+  - htop
+  - wget
+  - curl
+  - rsync
+  - zip
+  - unzip
+  - python
+  - python-pip
+  - ripgrep
+  - fd
+  - fzf
+  - openssh
+
+common_packages:
+  - man-db
+  - man-pages
+  - which
+  - grep
+  - sed
+  - gawk
+  - bash-completion

@@ -1,0 +1,42 @@
+---
+- name: Setup base system
+  hosts: all
+  roles:
+    - role: base
+    - role: fonts
+
+- name: Setup workstation
+  hosts: workstation
+  roles:
+    - role: arch
+    - role: desktop/tiling_wm/hyprland
+    - role: gpu/nvidia
+    - role: development/containers
+      vars:
+        auto_enter_dev_env: true
+        dev_container_name: dev
+        dev_container_image: archlinux:latest
+
+- name: Setup personal laptop
+  hosts: personal-laptop
+  roles:
+    - role: ubuntu
+    - role: desktop/tiling_wm/hyprland
+    - role: gpu/hybrid
+    - role: development/containers
+      vars:
+        auto_enter_dev_env: true
+        dev_container_name: dev
+        dev_container_image: archlinux:latest
+
+- name: Setup work laptop
+  hosts: work-laptop
+  roles:
+    - role: ubuntu
+    - role: desktop/tiling_wm/hyprland
+    - role: development/containers
+      vars:
+        auto_enter_dev_env: false
+        work_environment: true
+        dev_container_name: dev
+        dev_container_image: archlinux:latest

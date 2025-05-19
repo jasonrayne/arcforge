@@ -1,0 +1,48 @@
+# roles/arch/tasks/main.yml
+- name: Install yay AUR helper
+  block:
+    - name: Check if yay is installed
+      command: which yay
+      register: yay_check
+      failed_when: false
+      changed_when: false
+    
+    - name: Clone yay repository
+      git:
+        repo: https://aur.archlinux.org/yay.git
+        dest: /tmp/yay
+      when: yay_check.rc != 0
+    
+    - name: Build and install yay
+      shell: cd /tmp/yay && makepkg -si --noconfirm
+      when: yay_check.rc != 0
+
+- name: Install AUR packages
+  command: yay -S --noconfirm {{ item }}
+  loop: "{{ aur_packages }}"
+
+- name: Enable multilib repository
+  lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#\[multilib\]'
+    line: '[multilib]'
+    backrefs: yes
+  become: true
+  notify: update pacman
+
+- name: Enable multilib repository includes
+  lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#Include = /etc/pacman.d/mirrorlist'
+    line: 'Include = /etc/pacman.d/mirrorlist'
+    backrefs: yes
+    insertafter: '^\[multilib\]'
+  become: true
+  notify: update pacman
+
+- name: Install Arch gaming packages
+  package:
+    name: "{{ gaming_packages }}"
+    state: present
+  become: true
+  when: install_gaming | default(false)

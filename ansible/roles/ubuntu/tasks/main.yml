@@ -1,0 +1,27 @@
+# roles/ubuntu/tasks/main.yml
+- name: Add PPAs
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop: "{{ ubuntu_ppas }}"
+  become: true
+  notify: update apt cache
+
+- name: Install Ubuntu-specific packages
+  apt:
+    name: "{{ ubuntu_packages }}"
+    state: present
+  become: true
+
+- name: Configure Pop!_OS specific settings
+  block:
+    - name: Configure hybrid graphics
+      command: system76-power graphics {{ system76_graphics_mode | default('hybrid') }}
+      when: "'pop-desktop' in ansible_facts.packages"
+      become: true
+    
+    - name: Set power profile
+      command: system76-power profile {{ system76_power_profile | default('balanced') }}
+      when: "'pop-desktop' in ansible_facts.packages"
+      become: true
+  when: "'pop-desktop' in ansible_facts.packages"

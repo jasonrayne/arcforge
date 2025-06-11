@@ -33,6 +33,7 @@
   args:
     creates: "~/.local/share/containers/storage/overlay-containers/{{ dev_container_name }}"
 
+# Only create modular bash files, let Chezmoi manage .bashrc
 - name: Ensure modular bash config directory exists
   file:
     path: ~/.config/bash
@@ -65,22 +66,3 @@
       if [[ -z "$CONTAINER_ID" && "$TERM" != "dumb" && -z "$SSH_CONNECTION" && -t 1 && "$AUTO_DEV_ENV" == "true" ]]; then
         exec distrobox enter {{ dev_container_name }}
       fi
-
-- name: Ensure ~/.bashrc uses modular config structure
-  copy:
-    dest: ~/.bashrc
-    mode: '0644'
-    backup: yes
-    content: |
-      #
-      # ~/.bashrc
-      #
-
-      # If not running interactively, don't do anything
-      [[ $- != *i* ]] && return
-
-      # Load modular configs
-      for config in ~/.config/bash/*.sh; do
-          [[ -r "$config" ]] && source "$config"
-      done
-    force: no

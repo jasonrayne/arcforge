@@ -1,0 +1,32 @@
+---
+wayland_packages:
+  - hyprland
+  - waybar
+  - rofi-wayland
+  - swaylock
+  - grim
+  - slurp
+  - wl-clipboard
+  - xdg-desktop-portal-hyprland
+  - qt5-wayland
+  - qt6-wayland
+
+audio_packages:
+  - pipewire
+  - pipewire-alsa
+  - pipewire-pulse
+  - pipewire-jack
+  - wireplumber
+  - pavucontrol
+
+wayland_aur_packages:
+  - wlogout
+  - swappy
+
+# Desktop applications that dotfiles assume
+desktop_applications:
+  - firefox
+  - firefoxpwa
+  - signal-desktop
+  - mpv
+  - imv

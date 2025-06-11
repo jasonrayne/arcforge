@@ -17,7 +17,7 @@
 - name: Setup personal laptop
   hosts: personal_laptop
   roles:
-    - role: desktop/wm/hyprland          # Include for non-CachyOS systems
+    - role: desktop/tiling_wm/hyprland
       when: install_hyprland | default(false)
     - role: desktop/applications/terminal
     - role: desktop/applications/utilities
@@ -31,7 +31,7 @@
 - name: Setup work laptop  
   hosts: work_laptop
   roles:
-    - role: desktop/wm/hyprland          # Optional for work systems
+    - role: desktop/tiling_wm/hyprland
       when: install_hyprland | default(false)
     - role: desktop/applications/terminal
     - role: desktop/applications/utilities

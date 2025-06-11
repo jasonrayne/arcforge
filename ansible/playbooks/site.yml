@@ -7,21 +7,18 @@
     - role: shell/bash
     - role: development/tools
 
-- name: Setup workstation
+- name: Setup workstation (rhl-kaine)
   hosts: rhl-kaine
   roles:
     - role: desktop/applications/terminal
     - role: desktop/applications/utilities
     - role: gpu/nvidia
-    - role: development/containers
-      vars:
-        auto_enter_dev_env: true
-        dev_container_name: dev
-        dev_container_image: archlinux:latest
 
 - name: Setup personal laptop
   hosts: personal_laptop
   roles:
+    - role: desktop/wm/hyprland          # Include for non-CachyOS systems
+      when: install_hyprland | default(false)
     - role: desktop/applications/terminal
     - role: desktop/applications/utilities
     - role: gpu/hybrid
@@ -31,10 +28,14 @@
         dev_container_name: dev
         dev_container_image: archlinux:latest
 
-- name: Setup work laptop
+- name: Setup work laptop  
   hosts: work_laptop
   roles:
+    - role: desktop/wm/hyprland          # Optional for work systems
+      when: install_hyprland | default(false)
+    - role: desktop/applications/terminal
     - role: desktop/applications/utilities
+    - role: gpu/hybrid
     - role: development/containers
       vars:
         auto_enter_dev_env: false

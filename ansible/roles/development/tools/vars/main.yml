@@ -10,7 +10,8 @@ development_packages:
   - rust
   - ansible
   - terraform
-  - pandoc
+  # pandoc removed - pulls in 200+ Haskell dependencies
+  # Use pandoc-bin from AUR or install on-demand if needed
 
 dev_aur_packages:
   - ollama

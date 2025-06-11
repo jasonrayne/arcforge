@@ -1,0 +1,11 @@
+---
+- name: Install terminal packages
+  package:
+    name: "{{ terminal_packages }}"
+    state: present
+  become: true
+
+- name: Install AUR terminal packages
+  command: paru -S --noconfirm {{ item }}
+  loop: "{{ terminal_aur_packages }}"
+  when: ansible_facts['os_family'] == "Archlinux"

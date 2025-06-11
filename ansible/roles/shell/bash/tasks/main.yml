@@ -1,0 +1,38 @@
+---
+- name: Install bash packages
+  package:
+    name: "{{ bash_packages }}"
+    state: present
+  become: true
+
+- name: Install AUR bash packages
+  command: paru -S --noconfirm {{ item }}
+  loop: "{{ bash_aur_packages }}"
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Configure starship prompt
+  block:
+    - name: Create config directory
+      file:
+        path: ~/.config
+        state: directory
+        mode: '0755'
+    
+    - name: Check if starship config exists
+      stat:
+        path: ~/.config/starship.toml
+      register: starship_config
+    
+    - name: Create basic starship config
+      copy:
+        content: |
+          # Starship configuration
+          format = """
+          $all$character"""
+          
+          [character]
+          success_symbol = "[➜](bold green)"
+          error_symbol = "[➜](bold red)"
+        dest: ~/.config/starship.toml
+        mode: '0644'
+      when: not starship_config.stat.exists

@@ -20,6 +20,7 @@ arch_packages:
   - gawk
   - bash-completion
 
+# Modern CLI tools available in official repos
 modern_cli_packages:
   - bat
   - eza
@@ -32,14 +33,22 @@ modern_cli_packages:
   - duf
   - procs
   - hyperfine
-  - delta
+  - git-delta  # Correct package name
   - bottom
-  - bandwhich
+  - bandwhich  # Available in extra repo
   - tokei
   - thefuck
   - tldr
   - tmux
 
+# AUR packages only
 aur_packages:
   - lazygit
   - difftastic
+
+common_packages:
+  - man-db
+  - which
+  - grep
+  - sed
+  - gawk

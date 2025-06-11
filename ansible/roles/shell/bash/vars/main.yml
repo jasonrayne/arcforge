@@ -1,0 +1,7 @@
+---
+bash_packages:
+  - bash
+  - bash-completion
+
+bash_aur_packages:
+  - blesh

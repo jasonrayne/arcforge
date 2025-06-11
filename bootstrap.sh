@@ -9,7 +9,7 @@ export TERM=xterm-256color
 export COLORTERM=truecolor
 
 # Log file setup
-LOG_FILE="$HOME/arcforge_install.log"
+LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/arcforge_install.log"
 
 # Parse command line arguments
 DRY_RUN=false
@@ -100,7 +100,7 @@ backup_existing_config() {
       return 0
     fi
 
-    BACKUP_DIR="$HOME/arcforge_backup_$(date +%Y%m%d_%H%M%S)"
+    BACKUP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/arcforge_backup_$(date +%Y%m%d_%H%M%S)"
     execute mkdir -p "$BACKUP_DIR"
     # Backup key dotfiles
     execute cp -r "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile" "$BACKUP_DIR" 2>/dev/null || true
@@ -184,7 +184,7 @@ check_dependency() {
     fi
 
     case "$DISTRO" in
-    "arch" | "manjaro")
+    "arch" | "manjaro" | "cachyos")
       execute sudo pacman -S --noconfirm "$1"
       ;;
     "ubuntu" | "pop" | "debian" | "linuxmint")
@@ -267,8 +267,14 @@ install_dependencies() {
   fi
 
   case "$DISTRO" in
-  "arch" | "manjaro")
+  "arch" | "manjaro" | "cachyos")
     execute sudo pacman -Syu --noconfirm
+    # CachyOS uses paru by default
+    if [[ "$DISTRO" == "cachyos" ]]; then
+      if ! command -v paru &>/dev/null; then
+        execute sudo pacman -S --noconfirm paru
+      fi
+    fi
     check_dependency git
     check_dependency python
     check_dependency python-pip
@@ -278,6 +284,12 @@ install_dependencies() {
     ;;
   "ubuntu" | "pop" | "debian" | "linuxmint")
     execute sudo apt-get update && execute sudo apt-get upgrade -y
+    # CachyOS uses paru by default
+    if [[ "$DISTRO" == "cachyos" ]]; then
+      if ! command -v paru &>/dev/null; then
+        execute sudo pacman -S --noconfirm paru
+      fi
+    fi
     check_dependency git
     check_dependency python3
     check_dependency python3-pip
@@ -287,6 +299,12 @@ install_dependencies() {
     ;;
   "fedora")
     execute sudo dnf upgrade -y
+    # CachyOS uses paru by default
+    if [[ "$DISTRO" == "cachyos" ]]; then
+      if ! command -v paru &>/dev/null; then
+        execute sudo pacman -S --noconfirm paru
+      fi
+    fi
     check_dependency git
     check_dependency python3
     check_dependency python3-pip
@@ -347,13 +365,13 @@ clone_repos() {
     return 0
   fi
 
-  if [ ! -d "$HOME/arcforge" ]; then
+  if [ ! -d "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge" ]; then
     log_info "Cloning arcforge repository..."
-    execute git clone "$arcforge_repo" "$HOME/arcforge"
+    execute git clone "$arcforge_repo" "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge"
     log_success "Arcforge repository cloned successfully!"
   else
     log_info "Arcforge repository already exists, updating..."
-    (cd "$HOME/arcforge" && execute git pull)
+    (cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge" (cd "$HOME/arcforge" && execute git pull)(cd "$HOME/arcforge" && execute git pull) execute git pull)
     log_success "Arcforge repository updated!"
   fi
 
@@ -392,7 +410,7 @@ run_ansible() {
 
   log_info "Running Ansible playbooks..."
 
-  execute cd "$HOME/arcforge/ansible"
+  execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/ansible"
 
   # Determine the appropriate playbook based on hardware
   if [ -f /sys/class/power_supply/BAT0/status ] || [ -f /sys/class/power_supply/BAT1/status ]; then
@@ -437,7 +455,7 @@ setup_optional_components() {
   echo
   if [[ $DEV_ENV =~ ^[Yy]$ ]]; then
     log_info "Setting up development environments..."
-    execute cd "$HOME/arcforge/ansible"
+    execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/ansible"
     execute ansible-playbook -K playbooks/dev_environments.yml
     log_success "Development environments set up successfully!"
   fi
@@ -446,7 +464,7 @@ setup_optional_components() {
   echo
   if [[ $DISTROBOX =~ ^[Yy]$ ]]; then
     log_info "Setting up Distrobox containers..."
-    execute cd "$HOME/arcforge/distrobox"
+    execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/distrobox"
     execute ./setup_containers.sh
     log_success "Distrobox containers set up successfully!"
   fi

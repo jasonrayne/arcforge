@@ -1,0 +1,6 @@
+---
+terminal_packages:
+  - alacritty
+
+terminal_aur_packages:
+  - ghostty

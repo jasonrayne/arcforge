@@ -1,0 +1,14 @@
+---
+# Distrobox dependencies
+distrobox_deps:
+  - podman
+  - buildah  
+  - skopeo
+
+# Container configuration
+dev_container_name: dev
+dev_container_image: archlinux:latest
+auto_enter_dev_env: true
+
+# Default work environment setting
+work_environment: false

@@ -1,0 +1,8 @@
+---
+- name: Install font dependencies for Arch
+  pacman:
+    name: 
+      - fontconfig
+      - ttf-dejavu
+    state: present
+  become: true

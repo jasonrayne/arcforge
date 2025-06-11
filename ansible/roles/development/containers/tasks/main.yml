@@ -1,4 +1,4 @@
-# roles/development/containers/tasks/main.yml
+---
 - name: Install Distrobox dependencies
   package:
     name: "{{ distrobox_deps }}"
@@ -33,25 +33,54 @@
   args:
     creates: "~/.local/share/containers/storage/overlay-containers/{{ dev_container_name }}"
 
-- name: Configure container initialization
-  blockinfile:
-    path: "~/.bashrc"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK - DISTROBOX"
-    block: |
-      # Auto-enter development container
-      if [[ -z "$CONTAINER_ID" && "$TERM" != "dumb" && -z "$SSH_CONNECTION" && -t 1 && "$AUTO_DEV_ENV" == "true" ]]; then
-        exec distrobox enter {{ dev_container_name }}
-      fi
+- name: Ensure modular bash config directory exists
+  file:
+    path: ~/.config/bash
+    state: directory
+    mode: '0755'
 
-- name: Setup environment variables
+- name: Setup environment variables in exports.sh
   blockinfile:
-    path: "~/.bashrc"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK - ENV VARS"
+    path: ~/.config/bash/exports.sh
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - ARCFORGE ENV VARS"
+    create: yes
+    mode: '0644'
     block: |
-      # Environment setup
+      # Arcforge environment setup
       export AUTO_DEV_ENV={{ auto_enter_dev_env | default('false') }}
       {% if work_environment | default(false) %}
       export WORK_ENVIRONMENT=true
       {% else %}
       export WORK_ENVIRONMENT=false
       {% endif %}
+
+- name: Configure container auto-entry in work.sh
+  blockinfile:
+    path: ~/.config/bash/work.sh
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - ARCFORGE DISTROBOX"
+    create: yes
+    mode: '0644'
+    block: |
+      # Auto-enter development container (managed by Arcforge)
+      if [[ -z "$CONTAINER_ID" && "$TERM" != "dumb" && -z "$SSH_CONNECTION" && -t 1 && "$AUTO_DEV_ENV" == "true" ]]; then
+        exec distrobox enter {{ dev_container_name }}
+      fi
+
+- name: Ensure ~/.bashrc uses modular config structure
+  copy:
+    dest: ~/.bashrc
+    mode: '0644'
+    backup: yes
+    content: |
+      #
+      # ~/.bashrc
+      #
+
+      # If not running interactively, don't do anything
+      [[ $- != *i* ]] && return
+
+      # Load modular configs
+      for config in ~/.config/bash/*.sh; do
+          [[ -r "$config" ]] && source "$config"
+      done
+    force: no

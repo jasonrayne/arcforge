@@ -1,0 +1,18 @@
+---
+utility_packages:
+  - ark
+  - kcalc
+  - gwenview
+  - imv
+  - dolphin
+  - dolphin-plugins
+  - cliphist
+  - signal-desktop
+  - mpv
+  - firefox
+  - firefoxpwa
+
+utility_aur_packages:
+  - vesktop
+  - slack-desktop
+  - weechat

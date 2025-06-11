@@ -1,0 +1,11 @@
+---
+- name: Install utility packages
+  package:
+    name: "{{ utility_packages }}"
+    state: present
+  become: true
+
+- name: Install AUR utility packages
+  command: paru -S --noconfirm {{ item }}
+  loop: "{{ utility_aur_packages }}"
+  when: ansible_facts['os_family'] == "Archlinux"

@@ -4,12 +4,14 @@
   roles:
     - role: base
     - role: fonts
+    - role: shell/bash
+    - role: development/tools
 
 - name: Setup workstation
-  hosts: workstation
+  hosts: rhl-kaine
   roles:
-    - role: arch
-    - role: desktop/tiling_wm/hyprland
+    - role: desktop/applications/terminal
+    - role: desktop/applications/utilities
     - role: gpu/nvidia
     - role: development/containers
       vars:
@@ -18,10 +20,10 @@
         dev_container_image: archlinux:latest
 
 - name: Setup personal laptop
-  hosts: personal-laptop
+  hosts: personal_laptop
   roles:
-    - role: ubuntu
-    - role: desktop/tiling_wm/hyprland
+    - role: desktop/applications/terminal
+    - role: desktop/applications/utilities
     - role: gpu/hybrid
     - role: development/containers
       vars:
@@ -30,10 +32,9 @@
         dev_container_image: archlinux:latest
 
 - name: Setup work laptop
-  hosts: work-laptop
+  hosts: work_laptop
   roles:
-    - role: ubuntu
-    - role: desktop/tiling_wm/hyprland
+    - role: desktop/applications/utilities
     - role: development/containers
       vars:
         auto_enter_dev_env: false

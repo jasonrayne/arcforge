@@ -1,0 +1,18 @@
+---
+- name: Install development packages
+  package:
+    name: "{{ development_packages }}"
+    state: present
+  become: true
+
+- name: Install AUR development packages
+  command: paru -S --noconfirm {{ item }}
+  loop: "{{ dev_aur_packages }}"
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Install Go tools
+  shell: go install {{ item }}
+  loop: "{{ go_tools }}"
+  environment:
+    GOPATH: "{{ ansible_env.HOME }}/go"
+    PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/go/bin"

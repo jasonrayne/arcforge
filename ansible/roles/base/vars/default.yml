@@ -1,0 +1,7 @@
+---
+common_packages:
+  - man-db
+  - which
+  - grep
+  - sed
+  - gawk

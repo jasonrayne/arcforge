@@ -30,6 +30,8 @@
   when: paru_check.rc != 0
 
 - name: Install AUR packages
-  command: paru -S --noconfirm {{ item }}
+  command: paru -S --noconfirm {{ aur_item }}
   loop: "{{ aur_packages }}"
+  loop_control:
+    loop_var: aur_item
   when: aur_packages is defined

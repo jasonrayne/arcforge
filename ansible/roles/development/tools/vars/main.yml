@@ -1,0 +1,20 @@
+---
+development_packages:
+  - python
+  - python-pip
+  - python-pipx
+  - nodejs
+  - npm
+  - yarn
+  - go
+  - rust
+  - ansible
+  - terraform
+  - pandoc
+
+dev_aur_packages:
+  - ollama
+
+# Go tools installed via go install
+go_tools:
+  - github.com/trufflesecurity/trufflehog/v3@latest

@@ -1,3 +1,7 @@
+# Copy this file to hosts.yml and update hostnames to match your systems
+# Replace rhl-kaine with your workstation hostname
+# Replace *-hostname entries with your actual hostnames
+#
 all:
   children:
     personal:

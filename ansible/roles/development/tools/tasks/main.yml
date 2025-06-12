@@ -10,12 +10,14 @@
   loop: "{{ dev_aur_packages }}"
   when: ansible_facts['os_family'] == "Archlinux"
 
-- name: Install Python packages for Neovim
+- name: Install Python packages for Neovim (non-Arch systems)
   pip:
     name: "{{ python_packages }}"
     state: present
     extra_args: --user
-  when: python_packages is defined
+  when: 
+    - python_packages is defined
+    - ansible_facts['os_family'] != "Archlinux"
 
 - name: Install Go tools
   shell: go install {{ item }}

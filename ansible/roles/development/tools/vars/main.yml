@@ -3,6 +3,7 @@ development_packages:
   - python
   - python-pip
   - python-pipx
+  - python-pynvim        # Neovim Python provider (Arch system package)
   - nodejs
   - npm
   - yarn
@@ -21,10 +22,9 @@ dev_aur_packages:
   - trufflehog
   - mermaid-cli          # For Mermaid diagram rendering (provides 'mmdc')
 
-# Python packages for Neovim
+# Python packages for non-Arch systems (pip install --user)
 python_packages:
-  - neovim               # Python provider for Neovim
-  - pynvim               # Alternative/additional Neovim support
+  - pynvim               # For non-Arch distributions
 
 # Go tools installed via go install
 go_tools: []

@@ -27,6 +27,22 @@
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/go/bin"
   when: go_tools is defined and go_tools | length > 0
 
+- name: Configure npm global directory
+  shell: npm config set prefix '{{ ansible_env.HOME }}/.local'
+  args:
+    creates: "{{ ansible_env.HOME }}/.npmrc"
+
+- name: Install global npm packages for formatters
+  npm:
+    name: "{{ item }}"
+    global: yes
+    state: present
+  loop:
+    - markdownlint-cli2
+    - markdown-toc
+  environment:
+    npm_config_prefix: "{{ ansible_env.HOME }}/.local"
+
 # Ollama service configuration (runs after AUR packages are installed)
 - name: Check if ollama is installed
   command: which ollama

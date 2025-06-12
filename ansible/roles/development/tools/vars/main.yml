@@ -15,10 +15,7 @@ development_packages:
   - lua51
   - tree-sitter-cli
   - ghostscript
-  - texlive-basic
-  - texlive-latexextra
   - imagemagick
-  - fish
 
 dev_aur_packages:
   - ollama
@@ -27,11 +24,11 @@ dev_aur_packages:
   - prettier
   - ast-grep
   - ueberzugpp
+  - packer
 
 # Python packages for non-Arch systems (pip install --user)
 python_packages:
   - pynvim
 
 # Go tools installed via go install
-go_tools:
-  - github.com/hashicorp/packer@latest
+go_tools: []

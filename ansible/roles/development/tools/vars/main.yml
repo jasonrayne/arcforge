@@ -15,7 +15,9 @@ development_packages:
 
 dev_aur_packages:
   - ollama
+  - trufflehog
 
 # Go tools installed via go install
-go_tools:
-  - github.com/trufflesecurity/trufflehog/v3@latest
+go_tools: []
+  # Add go tools here as needed, e.g.:
+  # - github.com/some/tool@latest

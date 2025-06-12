@@ -33,12 +33,11 @@ modern_cli_packages:
   - duf
   - procs
   - hyperfine
-  - git-delta  # Correct package name
+  - git-delta
   - bottom
   - bandwhich  # Available in extra repo
   - tokei
   - thefuck
-  - tldr
   - tmux
 
 # AUR packages only

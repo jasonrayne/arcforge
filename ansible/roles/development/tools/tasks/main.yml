@@ -16,3 +16,57 @@
   environment:
     GOPATH: "{{ ansible_env.HOME }}/go"
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/go/bin"
+
+# Ollama service configuration (runs after AUR packages are installed)
+- name: Check if ollama is installed
+  command: which ollama
+  register: ollama_installed
+  failed_when: false
+  changed_when: false
+
+- name: Check if ollama service exists
+  stat:
+    path: /usr/lib/systemd/system/ollama.service
+  register: ollama_service_exists
+  when: ollama_installed.rc == 0
+
+- name: Create ollama systemd service override directory
+  file:
+    path: /etc/systemd/system/ollama.service.d
+    state: directory
+    mode: '0755'
+  become: true
+  when: ollama_installed.rc == 0 and ollama_service_exists.stat.exists
+
+- name: Configure ollama to use custom models directory
+  copy:
+    content: |
+      [Service]
+      Environment="OLLAMA_MODELS=/mnt/misc/ai/ollama/models"
+    dest: /etc/systemd/system/ollama.service.d/override.conf
+    mode: '0644'
+  become: true
+  when: ollama_installed.rc == 0 and ollama_service_exists.stat.exists
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: ollama_installed.rc == 0 and ollama_service_exists.stat.exists
+
+- name: Enable and start ollama service
+  systemd:
+    name: ollama
+    enabled: yes
+    state: started
+  become: true
+  when: ollama_installed.rc == 0 and ollama_service_exists.stat.exists
+
+- name: Open ollama port with UFW
+  ufw:
+    rule: allow
+    port: 11434
+    proto: tcp
+    comment: "ollama API for Open WebUI"
+  become: true
+  when: ollama_installed.rc == 0

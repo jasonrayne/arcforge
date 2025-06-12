@@ -27,9 +27,23 @@
         state: directory
         mode: '0700'
 
-    - name: Create SSH config
-      template:
-        src: ssh_config.j2
-        dest: ~/.ssh/config
-        mode: '0600'
-      when: not ansible_check_mode
+    - name: Install OpenSSH server
+      package:
+        name: openssh
+        state: present
+      become: true
+
+    - name: Enable and start SSH service
+      systemd:
+        name: sshd
+        enabled: yes
+        state: started
+      become: true
+
+    - name: Open SSH firewall port with UFW
+      ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+        comment: "SSH access for remote management"
+      become: true

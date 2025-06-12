@@ -332,23 +332,38 @@ install_ansible() {
   if ! command -v ansible &>/dev/null; then
     log_info "Installing Ansible..."
 
-    # Create virtual environment
-    if ! command -v python3 &>/dev/null; then
-      log_error "Python 3 is required but not installed."
-      exit 1
-    fi
-
-    # Install Ansible using pip
-    execute python3 -m pip install --user ansible
-
-    if ! command -v ansible &>/dev/null; then
-      # Add ~/.local/bin to PATH temporarily if needed
-      PATH="$HOME/.local/bin:$PATH"
-      if ! command -v ansible &>/dev/null; then
-        log_error "Failed to install Ansible."
-        exit 1
-      fi
-    fi
+    case "$DISTRO" in
+      "arch"|"manjaro"|"cachyos")
+        # Use system package manager for Arch-based systems
+        execute sudo pacman -S --noconfirm ansible
+        ;;
+      "ubuntu"|"pop"|"debian"|"linuxmint")
+        # Use pip for Debian-based systems
+        execute python3 -m pip install --user ansible
+        if ! command -v ansible &>/dev/null; then
+          PATH="$HOME/.local/bin:$PATH"
+          if ! command -v ansible &>/dev/null; then
+            log_error "Failed to install Ansible."
+            exit 1
+          fi
+        fi
+        ;;
+      "fedora")
+        # Use dnf for Fedora
+        execute sudo dnf install -y ansible
+        ;;
+      *)
+        # Fallback to pip for unknown distributions
+        execute python3 -m pip install --user ansible
+        if ! command -v ansible &>/dev/null; then
+          PATH="$HOME/.local/bin:$PATH"
+          if ! command -v ansible &>/dev/null; then
+            log_error "Failed to install Ansible."
+            exit 1
+          fi
+        fi
+        ;;
+    esac
 
     log_success "Ansible installed successfully!"
   else

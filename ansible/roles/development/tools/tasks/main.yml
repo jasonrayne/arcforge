@@ -10,12 +10,20 @@
   loop: "{{ dev_aur_packages }}"
   when: ansible_facts['os_family'] == "Archlinux"
 
+- name: Install Python packages for Neovim
+  pip:
+    name: "{{ python_packages }}"
+    state: present
+    extra_args: --user
+  when: python_packages is defined
+
 - name: Install Go tools
   shell: go install {{ item }}
   loop: "{{ go_tools }}"
   environment:
     GOPATH: "{{ ansible_env.HOME }}/go"
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/go/bin"
+  when: go_tools is defined and go_tools | length > 0
 
 # Ollama service configuration (runs after AUR packages are installed)
 - name: Check if ollama is installed

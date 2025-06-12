@@ -12,6 +12,7 @@ development_packages:
   - ansible
   - terraform
   - luarocks             # For Neovim plugin dependencies
+  - lua51
   - tree-sitter-cli      # CLI tool for treesitter (separate from nvim plugin)
   - ghostscript          # For PDF rendering in Snacks.image (provides 'gs')
   - texlive-basic        # For LaTeX math expressions (provides 'pdflatex')

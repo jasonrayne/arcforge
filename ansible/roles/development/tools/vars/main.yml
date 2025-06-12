@@ -3,7 +3,7 @@ development_packages:
   - python
   - python-pip
   - python-pipx
-  - python-pynvim        # Neovim Python provider (Arch system package)
+  - python-pynvim
   - nodejs
   - npm
   - yarn
@@ -11,23 +11,27 @@ development_packages:
   - rust
   - ansible
   - terraform
-  - luarocks             # For Neovim plugin dependencies
+  - luarocks
   - lua51
-  - tree-sitter-cli      # CLI tool for treesitter (separate from nvim plugin)
-  - ghostscript          # For PDF rendering in Snacks.image (provides 'gs')
-  - texlive-basic        # For LaTeX math expressions (provides 'pdflatex')
-  - imagemagick          # For image processing in Snacks.image
+  - tree-sitter-cli
+  - ghostscript
+  - texlive-basic
+  - texlive-latexextra
+  - imagemagick
+  - fish
 
 dev_aur_packages:
   - ollama
   - trufflehog
-  - mermaid-cli          # For Mermaid diagram rendering (provides 'mmdc')
+  - mermaid-cli
+  - prettier
+  - ast-grep
+  - ueberzugpp
 
 # Python packages for non-Arch systems (pip install --user)
 python_packages:
-  - pynvim               # For non-Arch distributions
+  - pynvim
 
 # Go tools installed via go install
-go_tools: []
-  # Add go tools here as needed, e.g.:
-  # - github.com/some/tool@latest
+go_tools:
+  - github.com/hashicorp/packer@latest

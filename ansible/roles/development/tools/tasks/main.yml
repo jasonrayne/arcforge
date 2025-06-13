@@ -15,7 +15,7 @@
     name: "{{ python_packages }}"
     state: present
     extra_args: --user
-  when: 
+  when:
     - python_packages is defined
     - ansible_facts['os_family'] != "Archlinux"
 
@@ -69,6 +69,7 @@
     content: |
       [Service]
       Environment="OLLAMA_MODELS=/mnt/misc/ai/ollama/models"
+      Environment="OLLAMA_HOST=0.0.0.0:11434"
     dest: /etc/systemd/system/ollama.service.d/override.conf
     mode: '0644'
   become: true

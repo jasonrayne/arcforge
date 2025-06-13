@@ -1,0 +1,11 @@
+---
+- name: Install cursor packages
+  package:
+    name: "{{ cursor_packages }}"
+    state: present
+  become: true
+
+- name: Install AUR cursor packages
+  command: paru -S --noconfirm {{ item }}
+  loop: "{{ cursor_aur_packages }}"
+  when: ansible_facts['os_family'] == "Archlinux"

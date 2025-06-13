@@ -1,0 +1,7 @@
+---
+cursor_packages:
+  - hyprcursor
+
+cursor_aur_packages:
+  - nordzy-hyprcursors
+  - rose-pine-hyprcursor

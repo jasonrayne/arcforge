@@ -1,4 +1,6 @@
-![WIP](https://img.shields.io/badge/status-WIP-orange)
+![WIP](https://img.shields.io/badge/status-WIP-orange?style=flat-square) ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+
+![Works on my machine](https://img.shields.io/badge/works%20on-my%20machine-darkgreen?style=flat-square) ![Issues: skill](https://img.shields.io/badge/issues-skill-red?style=flat-square)
 
 # Arcforge
 

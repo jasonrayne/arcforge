@@ -48,6 +48,8 @@ RED='\033[38;5;203m'     # #ee5396 - Red accent
 ORANGE='\033[38;5;209m'  # #ff6f00 - Orange accent
 YELLOW='\033[38;5;222m'  # #fdd13a - Yellow accent
 GRAY='\033[38;5;246m'    # #b6b8bb - Muted text
+RESET='\033[0m'          # Reset color
+BOLD='\033[1m'           # Bold text
 
 # Variables for hardware detection
 HAS_NVIDIA=false
@@ -284,12 +286,6 @@ install_dependencies() {
     ;;
   "ubuntu" | "pop" | "debian" | "linuxmint")
     execute sudo apt-get update && execute sudo apt-get upgrade -y
-    # CachyOS uses paru by default
-    if [[ "$DISTRO" == "cachyos" ]]; then
-      if ! command -v paru &>/dev/null; then
-        execute sudo pacman -S --noconfirm paru
-      fi
-    fi
     check_dependency git
     check_dependency python3
     check_dependency python3-pip
@@ -299,12 +295,6 @@ install_dependencies() {
     ;;
   "fedora")
     execute sudo dnf upgrade -y
-    # CachyOS uses paru by default
-    if [[ "$DISTRO" == "cachyos" ]]; then
-      if ! command -v paru &>/dev/null; then
-        execute sudo pacman -S --noconfirm paru
-      fi
-    fi
     check_dependency git
     check_dependency python3
     check_dependency python3-pip
@@ -380,13 +370,14 @@ clone_repos() {
     return 0
   fi
 
-  if [ ! -d "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge" ]; then
+  if [ ! -d "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge" ]; then
     log_info "Cloning arcforge repository..."
-    execute git clone "$arcforge_repo" "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge"
+    execute mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}"
+    execute git clone "$arcforge_repo" "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge"
     log_success "Arcforge repository cloned successfully!"
   else
     log_info "Arcforge repository already exists, updating..."
-    (cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge" (cd "$HOME/arcforge" && execute git pull)(cd "$HOME/arcforge" && execute git pull) execute git pull)
+    (cd "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge" && execute git pull)
     log_success "Arcforge repository updated!"
   fi
 
@@ -425,7 +416,7 @@ run_ansible() {
 
   log_info "Running Ansible playbooks..."
 
-  execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/ansible"
+  execute cd "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge/ansible"
 
   # Determine the appropriate playbook based on hardware
   if [ -f /sys/class/power_supply/BAT0/status ] || [ -f /sys/class/power_supply/BAT1/status ]; then
@@ -470,7 +461,7 @@ setup_optional_components() {
   echo
   if [[ $DEV_ENV =~ ^[Yy]$ ]]; then
     log_info "Setting up development environments..."
-    execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/ansible"
+    execute cd "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge/ansible"
     execute ansible-playbook -K playbooks/dev_environments.yml
     log_success "Development environments set up successfully!"
   fi
@@ -479,7 +470,7 @@ setup_optional_components() {
   echo
   if [[ $DISTROBOX =~ ^[Yy]$ ]]; then
     log_info "Setting up Distrobox containers..."
-    execute cd "${XDG_DATA_HOME:-$HOME/.local/src/personal}/arcforge/distrobox"
+    execute cd "${XDG_DATA_HOME:-$HOME/.local/share}/arcforge/distrobox"
     execute ./setup_containers.sh
     log_success "Distrobox containers set up successfully!"
   fi
@@ -491,6 +482,10 @@ main() {
   if [ "$DRY_RUN" = true ]; then
     LOG_FILE="$HOME/arcforge_dryrun.log"
   fi
+
+  # Create log directory if it doesn't exist
+  LOG_DIR=$(dirname "$LOG_FILE")
+  mkdir -p "$LOG_DIR" 2>/dev/null || true
 
   # Touch log file
   if [ "$DRY_RUN" = true ]; then
